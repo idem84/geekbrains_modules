@@ -5,6 +5,7 @@ export class Timer {
         this.timeinterval = 0;
         this.endtime = 0;
         this.pause = false;
+        this.stop = 1;
         this.sound = new Howl(
             { src: ['./sounds/Usb-connection-sound-effect.mp3'] }
         );
@@ -25,6 +26,7 @@ export class Timer {
     }
 
     initializeClock(id, endtime) {
+        this.stop = 0;
         let clock = document.getElementById(id);
         let hoursSpan = clock.querySelector(".hours");
         let minutesSpan = clock.querySelector(".minutes");
@@ -38,13 +40,16 @@ export class Timer {
         }
 
         const updateClock = () => {
-            if (!this.pause) {
+            if (!this.pause && this.stop === 0) {
                 let t = this.getTimeRemaining(this.endtime);
 
                 if (t.total < 0) {
                     document.getElementById("deadline-message").className = "visible";
                     this.sound.play();
                     clearInterval(this.timeinterval);
+
+                    this.stop = 1;
+
                     return true;
                 }
 
@@ -56,7 +61,11 @@ export class Timer {
         }
 
         updateClock();
-        this.timeinterval = setInterval(updateClock, 1000);
+
+        if (!this.pause) {
+            this.timeinterval = setInterval(updateClock, 1000);
+        }
+
     }
 
     stopClock() {
