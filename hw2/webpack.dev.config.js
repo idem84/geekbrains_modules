@@ -18,7 +18,13 @@ module.exports = {
                 // js - компиляция es6+ в es5
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: "babel-loader"
+                use: {
+					loader: 'babel-loader',
+					options: {
+					  presets: ['@babel/preset-env'],
+					  plugins: ['@babel/plugin-proposal-class-properties']
+					}
+				  }
             },
             {
                 test: /\.html$/,

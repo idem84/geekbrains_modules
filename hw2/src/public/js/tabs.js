@@ -42,6 +42,3 @@ export function Tabs() {
 
     loopNavLinks('click', navMenuItems);
 }
-
-
-//console.log(navMenuItems[i].getAttribute('href').substring(1));

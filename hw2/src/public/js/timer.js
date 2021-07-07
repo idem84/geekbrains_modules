@@ -1,11 +1,12 @@
 import { Howl } from "howler";
 
 export class Timer {
-    constructor() {
+    constructor(id) {
+        this.form = document.getElementById(id);
+        this.buttons = this.form.getElementsByTagName('button');
         this.timeinterval = 0;
         this.endtime = 0;
-        this.pause = false;
-        this.stop = 1;
+        this.start = 0;
         this.sound = new Howl(
             { src: ['./sounds/Usb-connection-sound-effect.mp3'] }
         );
@@ -26,50 +27,60 @@ export class Timer {
     }
 
     initializeClock(id, endtime) {
-        this.stop = 0;
+        this.start = 1;
         let clock = document.getElementById(id);
         let hoursSpan = clock.querySelector(".hours");
         let minutesSpan = clock.querySelector(".minutes");
         let secondsSpan = clock.querySelector(".seconds");
 
-        if (!this.pause) {
-            document.getElementById("deadline-message").className = "deadline-message";
-            this.endtime = endtime;
-        } else {
-            this.pause = false;
-        }
+        document.getElementById("deadline-message").className = "deadline-message";
+        this.endtime = endtime;
 
         const updateClock = () => {
-            if (!this.pause && this.stop === 0) {
-                let t = this.getTimeRemaining(this.endtime);
+            let t = this.getTimeRemaining(this.endtime);
 
-                if (t.total < 0) {
-                    document.getElementById("deadline-message").className = "visible";
-                    this.sound.play();
-                    clearInterval(this.timeinterval);
+            if (t.total < 0) {
+                document.getElementById("deadline-message").className = "visible";
+                this.sound.play();
+                clearInterval(this.timeinterval);
 
-                    this.stop = 1;
+                this.start = 0;
 
-                    return true;
-                }
-
-                hoursSpan.innerHTML = ("0" + t.hours).slice(-2);
-                minutesSpan.innerHTML = ("0" + t.minutes).slice(-2);
-                secondsSpan.innerHTML = ("0" + t.seconds).slice(-2);
+                return true;
             }
 
+            hoursSpan.innerHTML = ("0" + t.hours).slice(-2);
+            minutesSpan.innerHTML = ("0" + t.minutes).slice(-2);
+            secondsSpan.innerHTML = ("0" + t.seconds).slice(-2);
         }
 
         updateClock();
 
-        if (!this.pause) {
-            this.timeinterval = setInterval(updateClock, 1000);
-        }
+        this.timeinterval = setInterval(updateClock, 1000);
 
     }
 
     stopClock() {
-        this.pause = true;
+        clearInterval(this.timeinterval);
+        this.start = 0;
+    }
+
+    doTimerAction = id => {
+        switch (parseInt(id)) {
+            case 1:
+                if (this.start === 0) {
+                    let seconds = this.form.getElementsByClassName('seconds')[0].value;
+                    let deadline = new Date(Date.parse(new Date()) + seconds * 1000);
+                    this.initializeClock('countdown', deadline);
+                    document.getElementById('countdown').style.display = 'block';
+                }
+
+                break
+            case 2:
+                this.stopClock();
+
+                break;
+        }
     }
 }
 
